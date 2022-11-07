@@ -111,6 +111,13 @@ regnet_weights = {
     'timm-regnety_320': {
         'imagenet': 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_320-ba464b29.pth'
     }
+
+    'timm-regnety_320': {
+        'imagenet': 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_320-ba464b29.pth'
+    }
+    'timm-regnetz_040': {
+        'imagenet': 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-tpu-weights/regnetz_040h_ra3-f594343b.pth'
+    }
 }
 
 pretrained_settings = {}
@@ -329,4 +336,14 @@ timm_regnet_encoders = {
             'cfg': _mcfg(w0=232, wa=115.89, wm=2.53, group_w=232, depth=20, se_ratio=0.25)
         },
     },
+    'timm-regnetz_040': {
+        'encoder': RegNetEncoder,
+        "pretrained_settings": pretrained_settings["timm-regnetz_040"],
+        'params': {
+            'out_channels': (3, 32, 256, 512, 896, 2048),
+            'cfg': _mcfg(depth=28, w0=48, wa=14.5, wm=2.226, group_size=8, bottle_ratio=4.0, se_ratio=0.25,
+        downsample=None, linear_out=True, num_features=1536, act_layer='silu')
+        },
+    },
+
 }

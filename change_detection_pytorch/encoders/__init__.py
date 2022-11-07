@@ -24,6 +24,7 @@ from .vgg import vgg_encoders
 from .xception import xception_encoders
 from .swin_transformer import swin_transformer_encoders
 from .mit_encoder import mit_encoders
+
 # from .hrnet import hrnet_encoders
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
