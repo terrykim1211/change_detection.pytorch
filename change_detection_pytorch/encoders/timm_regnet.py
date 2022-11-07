@@ -110,11 +110,7 @@ regnet_weights = {
     },
     'timm-regnety_320': {
         'imagenet': 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_320-ba464b29.pth'
-    }
-
-    'timm-regnety_320': {
-        'imagenet': 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_320-ba464b29.pth'
-    }
+    },
     'timm-regnetz_040': {
         'imagenet': 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-tpu-weights/regnetz_040h_ra3-f594343b.pth'
     }
