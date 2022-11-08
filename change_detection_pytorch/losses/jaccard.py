@@ -1,38 +1,48 @@
-from typing import List
+from typing import Optional, List
 
 import torch
 import torch.nn.functional as F
-from pytorch_toolbelt.utils.torch_utils import to_tensor
-from torch import Tensor
 from torch.nn.modules.loss import _Loss
+from ._functional import soft_jaccard_score, to_tensor
+from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
-from .functional import soft_jaccard_score
-
-__all__ = ["JaccardLoss", "BINARY_MODE", "MULTICLASS_MODE", "MULTILABEL_MODE"]
-
-BINARY_MODE = "binary"
-MULTICLASS_MODE = "multiclass"
-MULTILABEL_MODE = "multilabel"
+__all__ = ["JaccardLoss"]
 
 
 class JaccardLoss(_Loss):
-    """
-    Implementation of Jaccard loss for image segmentation task.
-    It supports binary, multi-class and multi-label cases.
-    """
+    __name__ = "JaccardLoss"
 
-    def __init__(self, mode: str, classes: List[int] = None, log_loss=False, from_logits=True, smooth=0, eps=1e-7):
-        """
-        :param mode: Metric mode {'binary', 'multiclass', 'multilabel'}
-        :param classes: Optional list of classes that contribute in loss computation;
-        By default, all channels are included.
-        :param log_loss: If True, loss computed as `-log(jaccard)`; otherwise `1 - jaccard`
-        :param from_logits: If True assumes input is raw logits
-        :param smooth:
-        :param eps: Small epsilon for numerical stability
+    def __init__(
+        self,
+        mode: str,
+        classes: Optional[List[int]] = None,
+        log_loss: bool = False,
+        from_logits: bool = True,
+        smooth: float = 0.,
+        eps: float = 1e-7,
+    ):
+        """Implementation of Jaccard loss for image segmentation task.
+        It supports binary, multiclass and multilabel cases
+
+        Args:
+            mode: Loss mode 'binary', 'multiclass' or 'multilabel'
+            classes:  List of classes that contribute in loss computation. By default, all channels are included.
+            log_loss: If True, loss computed as `- log(jaccard_coeff)`, otherwise `1 - jaccard_coeff`
+            from_logits: If True, assumes input is raw logits
+            smooth: Smoothness constant for dice coefficient
+            eps: A small epsilon for numerical stability to avoid zero division error
+                (denominator will be always greater or equal to eps)
+
+        Shape
+             - **y_pred** - torch.Tensor of shape (N, C, H, W)
+             - **y_true** - torch.Tensor of shape (N, H, W) or (N, C, H, W)
+
+        Reference
+            https://github.com/BloodAxe/pytorch-toolbelt
         """
         assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}
         super(JaccardLoss, self).__init__()
+
         self.mode = mode
         if classes is not None:
             assert mode != BINARY_MODE, "Masking classes is not supported with mode=binary"
@@ -44,12 +54,8 @@ class JaccardLoss(_Loss):
         self.eps = eps
         self.log_loss = log_loss
 
-    def forward(self, y_pred: Tensor, y_true: Tensor) -> Tensor:
-        """
-        :param y_pred: NxCxHxW
-        :param y_true: NxHxW
-        :return: scalar
-        """
+    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
+
         assert y_true.size(0) == y_pred.size(0)
 
         if self.from_logits:
